@@ -4,13 +4,16 @@ import Axios from 'axios';
 
 
 class Product extends Component {
-  state = {
-    products: [],
-    newProductData: {
-      productType: '',
-      price: 0.0
-    },
-    newProductModal : false
+  constructor(props){
+    super(props);
+    this.state = {
+      products: [],
+      newProductData: {
+        productType: '',
+        price: 0.0
+      },
+      newProductModal : false
+    };
   }
 
   componentDidMount(){

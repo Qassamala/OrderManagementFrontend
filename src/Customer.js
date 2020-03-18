@@ -7,24 +7,28 @@ import MyContext from './MyContext';
 
 
 class Customer extends Component {
-  static contextType = MyContext;
-
-  state = {
-    customerId: '',
-    customers: [],
-    newCustomerData: {
-        name: '',
-      customerType: ''
-    },
-    editCustomerData: {
-        id: null,
-        name: '',
-      customerType: ''
-    },
-    newCustomerModal : false,
-    editCustomerModal : false
+  constructor(props){
+    super(props);
+      this.state = {
+        customerId: '',
+        customers: [],
+        newCustomerData: {
+            name: '',
+          customerType: ''
+        },
+        editCustomerData: {
+            id: null,
+            name: '',
+          customerType: ''
+        },
+        newCustomerModal : false,
+        editCustomerModal : false
+    
+      };
 
   }
+  static contextType = MyContext;
+
 
   componentDidMount(){
     Axios.get('https://localhost:44345/api/Customers').then((response) =>{
