@@ -5,53 +5,51 @@ import MyContext from './MyContext';
 
 
 class Order extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      customers: [],
+      customer: {
+        name: '',
+        customerType: ''
+      },
+      discount: 0.1,
+      product: {
+        productId: '',
+        productType: '',
+        productPrice: ''
+      },  
+      products: [],
+      customerId: this.props.customerId,
+      orders: [],
+      newOrderData: {
+          customerId: this.props.customerId,
+          totalSum: '',
+          totalDiscount: '',
+          rows: []
+      },
+      newOrderRowData:{
+        productId: null,
+        singleProductPrice: null,
+        quantity: null,
+        totalSum: null,
+        totalDiscount: null,
+        orderId: null
+  
+      },
+      editOrderData: {
+          id: null,
+          customerId: '',
+          totalSum: '',
+          totalDiscount: '',
+          rows: []
+      },
+      newOrderModal : false,
+      editOrderModal : false
+  };
+}
   static contextType = MyContext;
-  // constructor(props) {
-  //   super(props);
-  //   this.product = null    
-  // }
 
-  state = {
-    customers: [],
-    customer: {
-      name: '',
-      customerType: ''
-    },
-    discount: 0.1,
-    product: {
-      productId: '',
-      productType: '',
-      productPrice: ''
-    },  
-    products: [],
-    customerId: this.props.customerId, //props or state? semms to be props, repercussions, can this change due to multiple users using this app on teh same db
-    orders: [],
-    newOrderData: {
-        customerId: this.props.customerId,
-        totalSum: '',
-        totalDiscount: '',
-        rows: []
-    },
-    newOrderRowData:{
-      productId: null,
-      singleProductPrice: null,
-      quantity: null,
-	    totalSum: null,
-	    totalDiscount: null,
-	    orderId: null
-
-    },
-    editOrderData: {
-        id: null,
-        customerId: '',
-        totalSum: '',
-        totalDiscount: '',
-        rows: []
-    },
-    newOrderModal : false,
-    editOrderModal : false
-
-  }
 
   async componentDidMount(){
     await Axios.get('https://localhost:44345/api/Products').then((response) =>{
@@ -174,14 +172,14 @@ getProductPrice = () => {
 }
 
 setCustomersState(){
-  return(
-    
 
+  return(
     <MyContext.Consumer>
       customers => (
-        {this.state.customer = this.context.customers.find(c => c.id = this.state.customerId)}
-        
-     
+        {this.setState({
+          customer: this.context.customers.find(c => c.id = this.state.customerId)
+        })}
+        {/* {this.state.customer = this.context.customers.find(c => c.id = this.state.customerId)}              */}
     </MyContext.Consumer>
   )
 
