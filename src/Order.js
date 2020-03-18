@@ -179,7 +179,6 @@ setCustomersState(){
         {this.setState({
           customer: this.context.customers.find(c => c.id = this.state.customerId)
         })}
-        {/* {this.state.customer = this.context.customers.find(c => c.id = this.state.customerId)}              */}
     </MyContext.Consumer>
   )
 
