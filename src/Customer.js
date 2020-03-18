@@ -32,7 +32,6 @@ class Customer extends Component {
 
  async componentDidMount(){
     await Axios.get('https://localhost:44345/api/Customers').then((response) =>{
-      console.log(response.data)
        this.setState({
         customers: response.data
         
@@ -129,8 +128,6 @@ async setContextCustomerId(id){
 
 }
 async setContextCustomer(customer){
-  console.log(this.context.customer)
-
 
   return(
     <MyContext.Consumer>
@@ -148,22 +145,14 @@ async detailsCustomer(id, customer) {
   await this.setContextCustomerId(id);
 
   await this.setContextCustomer(customer);
-
   
   await this.setState({customerId: id})
-
-  console.log(this.state.customerId, 'customerId');
-  console.log(this.context.customerId, 'ContextcustomerId');
-  console.log(this.context.customer, 'Contextcustomer');
-
 
   this.props.history.push("/CustomerDetails/" + id)
 }
 
 
   render()  {
-    console.log(this.state.customers);
-
     let customers = this.state.customers.map((customer) =>{
       return (
         

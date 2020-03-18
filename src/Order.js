@@ -5,20 +5,17 @@ import MyContext from './MyContext';
 
 
 class Order extends Component {
+  static contextType = MyContext;
   constructor(props){
     super(props);
     this.state = {
-      // customer: {
-      //   id: '',
-      //   name: '',
-      //   customerType: ''
-      // },
       discount: 0.1,
       product: {
         productId: '',
         productType: '',
         productPrice: ''
       },  
+
       products: [],
       customerId: this.props.customerId,
       orders: [],
@@ -48,8 +45,6 @@ class Order extends Component {
       editOrderModal : false
   };
 }
-  static contextType = MyContext;
-
 
   async componentDidMount(){
     await Axios.get('https://localhost:44345/api/Products').then((response) =>{
@@ -58,33 +53,42 @@ class Order extends Component {
         customer: this.setCustomerState()
       })
     });
-    // this.setCustomerState();
-    
+    await Axios.get('https://localhost:44345/api/Orders/customer/' + this.state.customerId).then((response) =>{
+      this.setState({
+        orders: response.data
+      })
+    }); 
   }
-
-  // async componentWillMount(){   
-  //   await Axios.get('https://localhost:44345/api/Orders/customer/' + this.state.customerId).then((response) =>{
-  //     this.setState({
-  //       orders: response.data
-  //     })
-  //   });
-  // }
 
   toggleNewOrderModal(){
     this.setState({
       newOrderModal : !this.state.newOrderModal
     })
-
   }
 
   toggleEditOrderModal(){
     this.setState({
       editOrderModal : !this.state.editOrderModal
     })
+  }
+
+  async addOrderRow(){
+    console.log(this.state.newOrderRowData);
+    const rows = this.state.newOrderData.rows.slice();
+
+    await this.setState({
+      newOrderData: {
+        rows : rows.push(this.state.newOrderRowData)
+      }
+    })
+
+      console.log(this.state.newOrderRowData);
+
+      console.log(this.state.newOrderData);
 
   }
 
-  async addOrder(){
+  async sendOrder(){
     const url = 'https://localhost:44345/api/Orders';
     return  await Axios(url, {
       method: 'POST',
@@ -113,7 +117,6 @@ class Order extends Component {
      this.setState({
         editOrderData: { id, totalSum, totalDiscount, rows}, editOrderModal: !this.state.editOrderModal
     });
-
   }
 
   updateOrder(){
@@ -133,7 +136,6 @@ class Order extends Component {
           orders: response.data
         })
       });
-
   }
 
   deleteOrder(id){
@@ -143,9 +145,9 @@ class Order extends Component {
   }); 
 }
 
-detailsOrder(id){
-    // BrowserRouter.push("/CustomerDetails" + id);
-}
+// detailsOrder(id){
+//     // BrowserRouter.push("/CustomerDetails" + id);
+// }
 
 async onSelect(e) {
 
@@ -162,6 +164,17 @@ async onSelect(e) {
     {this.product = this.state.products.find(p => p.productId === this.state.productId)}
 
     this.getDiscount();
+
+    let {newOrderRowData} = this.state;
+
+              newOrderRowData.productId = this.state.product.productId;
+              newOrderRowData.singleProductPrice = this.state.product.productPrice;
+              newOrderRowData.totalSum = this.state.product.productPrice * this.state.newOrderRowData.quantity;
+              newOrderRowData.totalDiscount = (this.state.product.productPrice * this.state.newOrderRowData.quantity) * this.state.discount;
+
+              this.setState({newOrderRowData});
+      console.log(newOrderRowData);
+
 
 }
 
@@ -181,7 +194,6 @@ setCustomerState(){
         })}
     </MyContext.Consumer>
   )
-
 }
 
 getDiscount = () => {
@@ -223,7 +235,7 @@ getDiscount = () => {
 
     <Button className="my-3" color="primary" onClick={this.toggleNewOrderModal.bind(this)}>Add a new order</Button>
       <Modal isOpen={this.state.newOrderModal} toggle={this.toggleNewOrderModal.bind(this)}>
-        <ModalHeader toggle={this.toggleNewOrderModal.bind(this)}>Add a new order for</ModalHeader>
+        <ModalHeader toggle={this.toggleNewOrderModal.bind(this)}>Add a new order</ModalHeader>
         <ModalBody>
           Price of {this.state.product.productType} is: {this.state.product.productPrice} SEK
           <p></p>
@@ -242,7 +254,7 @@ getDiscount = () => {
               <option key ={product.id} value = {[product.id, product.productType, product.price]}>
                   {product.productType}
                 </option>
-             ))}          
+             ))},                      
             </Input>            
         </FormGroup>
         <FormGroup>
@@ -257,7 +269,8 @@ getDiscount = () => {
         </FormGroup>     
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={this.addOrder.bind(this)}>Add Order</Button>{' '}
+        <Button color="primary" onClick={this.sendOrder.bind(this)}>Send Order</Button>{' '}
+          <Button color="primary" onClick={this.addOrderRow.bind(this)}>Add Order</Button>{' '}
           <Button color="secondary" onClick={this.toggleNewOrderModal.bind(this)}>Cancel</Button>
         </ModalFooter>
       </Modal>
@@ -300,9 +313,10 @@ getDiscount = () => {
         <Table>
           <thead>
             <tr>
-              {/* <th>Id</th> */}
-              <th>Name</th>
-              <th>CustomerType</th>
+              <th>Id</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Total Sum</th>
               <th>Actions</th>
             </tr>
           </thead>
