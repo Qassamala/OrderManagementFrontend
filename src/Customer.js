@@ -10,7 +10,7 @@ class Customer extends Component {
   constructor(props){
     super(props);
       this.state = {
-        customerId: '',
+        
         customers: [],
         newCustomerData: {
             name: '',
@@ -30,13 +30,19 @@ class Customer extends Component {
   static contextType = MyContext;
 
 
-  componentDidMount(){
-    Axios.get('https://localhost:44345/api/Customers').then((response) =>{
-      this.setState({
+ async componentDidMount(){
+    await Axios.get('https://localhost:44345/api/Customers').then((response) =>{
+      console.log(response.data)
+       this.setState({
         customers: response.data
+        
+
       })
     });
+  console.log(this.state.customers)
+
   }
+  
 
   toggleNewCustomerModal(){
     this.setState({
@@ -94,12 +100,13 @@ class Customer extends Component {
   }
 
   _refreshCustomerList(){
+  console.log(this.state.customers)
+
     Axios.get('https://localhost:44345/api/Customers').then((response) =>{
-        this.setState({
+        this.setState({          
           customers: response.data
         })
       });
-
   }
 
   deleteCustomer(id){
@@ -108,49 +115,66 @@ class Customer extends Component {
       this._refreshCustomerList();
   }); 
 }
-setContextCustomerId(id){
-  console.log(this.state.customers)
+
+async setContextCustomerId(id){
 
   return(
     <MyContext.Consumer>
       setCustomerId => (
-      {this.context.customerId=id},
-      customers => (
-        {this.context.customers = this.state.customers}
+      {this.context.customerId=id}
       )
     </MyContext.Consumer>
   )
 
 
 }
+async setContextCustomer(customer){
+  console.log(this.context.customer)
 
 
-async detailsCustomer(id) {
+  return(
+    <MyContext.Consumer>
+      customer => (
+        {this.context.customer = customer}
+        {console.log(this.context.customer)}
+      )
+    </MyContext.Consumer>
+  )
+}
 
-  this.setContextCustomerId(id);
+
+async detailsCustomer(id, customer) {
+
+  await this.setContextCustomerId(id);
+
+  await this.setContextCustomer(customer);
+
   
   await this.setState({customerId: id})
 
   console.log(this.state.customerId, 'customerId');
+  console.log(this.context.customerId, 'ContextcustomerId');
+  console.log(this.context.customer, 'Contextcustomer');
 
 
   this.props.history.push("/CustomerDetails/" + id)
 }
 
-  render(){
-    
 
+  render()  {
+    console.log(this.state.customers);
 
     let customers = this.state.customers.map((customer) =>{
       return (
+        
           
         <tr key={customer.id}>
-              {/* <td>{customer.id}</td> */}
+              <td>{customer.id}</td>
               <td>{customer.name}</td>
               <td>{customer.customerType}</td>
               <td>
                 <Button color="success" size="sm" className="mr-2" onClick={this.editCustomer.bind(this, customer.id, customer.name, customer.customerType)}>Edit</Button>
-                <Button color="success" size="sm" className="mr-2" onClick={this.detailsCustomer.bind(this, customer.id)}>Details</Button>
+                <Button color="success" size="sm" className="mr-2" onClick={this.detailsCustomer.bind(this, customer.id, customer)}>Details</Button>
                 <Button color="danger" size="sm" onClick={this.deleteCustomer.bind(this, customer.id)}>Delete</Button>
               </td>
               </tr>
@@ -234,7 +258,7 @@ async detailsCustomer(id) {
         <Table>
           <thead>
             <tr>
-              {/* <th>Id</th> */}
+              <th>Id</th>
               <th>Name</th>
               <th>CustomerType</th>
               <th>Actions</th>
@@ -250,15 +274,14 @@ async detailsCustomer(id) {
     <MyContext.Consumer>
       {      
       props => {
-        return <h3>Test Id: {this.context.customerId}</h3>
+        return <h3>Test Context Id: {this.context.customerId}</h3>
+        
       }
       }
     </MyContext.Consumer>
     </div>
         
       </div>
-
-
     );
 
   }

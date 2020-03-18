@@ -9,16 +9,16 @@ class App extends Component {
   state = {
     customerId: null,
     setCustomerId: this.setCustomerId,
-    customers: [],
-    setCustomers: this.setCustomers,
+    customer: {},
+    setCustomer: this.setCustomer,
   }
 
   setCustomerId = (customerId) => {
     this.setState({customerId});
   };
 
-  setCustomers = (customers) => {
-    this.setState({customers});
+  setCustomer = (customer) => {
+    this.setState({customer});
   };
 
   render(){

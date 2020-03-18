@@ -8,11 +8,11 @@ class Order extends Component {
   constructor(props){
     super(props);
     this.state = {
-      customers: [],
-      customer: {
-        name: '',
-        customerType: ''
-      },
+      // customer: {
+      //   id: '',
+      //   name: '',
+      //   customerType: ''
+      // },
       discount: 0.1,
       product: {
         productId: '',
@@ -54,10 +54,11 @@ class Order extends Component {
   async componentDidMount(){
     await Axios.get('https://localhost:44345/api/Products').then((response) =>{
        this.setState({
-        products: response.data
+        products: response.data,
+        customer: this.setCustomerState()
       })
     });
-    this.setCustomersState();
+    // this.setCustomerState();
     
   }
 
@@ -146,18 +147,17 @@ detailsOrder(id){
     // BrowserRouter.push("/CustomerDetails" + id);
 }
 
-onSelect = (e) => {
+async onSelect(e) {
 
   const [productId, productType, productPrice] = e.target.value.split(',');
 
-    this.setState({
+    await this.setState({
       product:{
         productId,
         productType,
         productPrice,
       }
     });
-
 
     {this.product = this.state.products.find(p => p.productId === this.state.productId)}
 
@@ -171,13 +171,13 @@ getProductPrice = () => {
 
 }
 
-setCustomersState(){
+setCustomerState(){
 
   return(
     <MyContext.Consumer>
-      customers => (
+      customer => (
         {this.setState({
-          customer: this.context.customers.find(c => c.id = this.state.customerId)
+          customer: this.context.customer
         })}
     </MyContext.Consumer>
   )
@@ -186,20 +186,14 @@ setCustomersState(){
 
 getDiscount = () => {
 
-
-  
-  console.log(this.context.customers)
-  console.log(this.state.customer)
-
-
-    if(this.state.customer.customerType === "Large Customer" && (this.state.product.productType === 'Pen' ||this.state.product.productType === 'Paper' )){
+    if(this.context.customer.customerType === "Large Company" && (this.state.product.productType === 'Pen' ||this.state.product.productType === 'Paper' )){
       this.setState({
         discount: 0.3
       })
       console.log(this.state.discount)
 
     }
-    else if(this.state.customer.customerType === "Private Customer"){
+    else if(this.context.customer.customerType === "Private Customer"){
       this.setState({
         discount: 0.0
       })
@@ -227,9 +221,9 @@ getDiscount = () => {
     return (
       <div className="App container">
 
-              <Button className="my-3" color="primary" onClick={this.toggleNewOrderModal.bind(this)}>Add a new order</Button>
+    <Button className="my-3" color="primary" onClick={this.toggleNewOrderModal.bind(this)}>Add a new order</Button>
       <Modal isOpen={this.state.newOrderModal} toggle={this.toggleNewOrderModal.bind(this)}>
-        <ModalHeader toggle={this.toggleNewOrderModal.bind(this)}>Add a new order</ModalHeader>
+        <ModalHeader toggle={this.toggleNewOrderModal.bind(this)}>Add a new order for</ModalHeader>
         <ModalBody>
           Price of {this.state.product.productType} is: {this.state.product.productPrice} SEK
           <p></p>
