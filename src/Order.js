@@ -71,16 +71,44 @@ class Order extends Component {
       editOrderModal : !this.state.editOrderModal
     })
   }
+  // calculateSum(){
+  //   let totalSum = null;
+  //   this.state.newOrderData.rows.forEach(row => totalSum += row.totalSum)
+  //   console.log(totalSum)
+  //   return totalSum;
+
+  // }
+
+  // calculateDiscount(){
+  //   console.log(this.state.newOrderData);
+  //   let totalDiscount= null;
+  //   this.state.newOrderData.rows.forEach(row => totalDiscount += row.totalDiscount)
+  //   console.log(totalDiscount)
+  //   return totalDiscount;
+
+  // }
 
   async addOrderRow(){
     console.log(this.state.newOrderRowData);
     const rows = this.state.newOrderData.rows.slice();
+    rows.push(this.state.newOrderRowData);
+
+    let totalSum = null;
+    rows.forEach(row => totalSum += row.totalSum)
+
+    let totalDiscount= null;
+    rows.forEach(row => totalDiscount += row.totalDiscount)
+
 
     await this.setState({
       newOrderData: {
-        rows : rows.push(this.state.newOrderRowData)
+        customerId: this.context.customer.id,
+        totalSum: totalSum,
+        totalDiscount: totalDiscount,
+        rows : rows
       }
     })
+    console.log(this.state.newOrderData.rows)
 
       console.log(this.state.newOrderRowData);
 
@@ -174,8 +202,6 @@ async onSelect(e) {
 
               this.setState({newOrderRowData});
       console.log(newOrderRowData);
-
-
 }
 
 getProductPrice = () => {
