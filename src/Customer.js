@@ -38,11 +38,8 @@ class Customer extends Component {
 
       })
     });
-  console.log(this.state.customers)
-
   }
   
-
   toggleNewCustomerModal(){
     this.setState({
       newCustomerModal : !this.state.newCustomerModal
@@ -54,7 +51,6 @@ class Customer extends Component {
     this.setState({
       editCustomerModal : !this.state.editCustomerModal
     })
-
   }
 
   async addCustomer(){
@@ -84,7 +80,6 @@ class Customer extends Component {
      this.setState({
         editCustomerData: { id, name, customerType}, editCustomerModal: !this.state.editCustomerModal
     });
-
   }
 
   updateCustomer(){

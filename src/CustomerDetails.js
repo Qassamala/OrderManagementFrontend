@@ -6,9 +6,9 @@ import MyContext from './MyContext';
 
 
 class CustomerDetails extends Component {
-    constructor(props){
-        super(props);
-    }
+    // constructor(props){
+    //     super(props);
+    // }
     static contextType = MyContext;
 
     onNavigate = () => {

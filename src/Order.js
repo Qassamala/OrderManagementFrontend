@@ -10,17 +10,17 @@ class Order extends Component {
     super(props);
     this.state = {
       discount: 0.1,
+      products: [],
       product: {
         productId: '',
         productType: '',
         productPrice: ''
-      },  
-
-      products: [],
+      },
+      rows: [],
       customerId: this.props.customerId,
       orders: [],
       newOrderData: {
-          customerId: this.props.customerId,
+          customerId: '',
           totalSum: '',
           totalDiscount: '',
           rows: []
@@ -71,32 +71,26 @@ class Order extends Component {
       editOrderModal : !this.state.editOrderModal
     })
   }
-  // calculateSum(){
-  //   let totalSum = null;
-  //   this.state.newOrderData.rows.forEach(row => totalSum += row.totalSum)
-  //   console.log(totalSum)
-  //   return totalSum;
 
-  // }
+  async addOrderRowToOrder() {
+    console.log(this.state.rows, 'state.rows');
+    const rows = Object.assign([], this.state.rows);
+    rows.push(this.state.newOrderRowData)
+    console.log(rows)
 
-  // calculateDiscount(){
-  //   console.log(this.state.newOrderData);
-  //   let totalDiscount= null;
-  //   this.state.newOrderData.rows.forEach(row => totalDiscount += row.totalDiscount)
-  //   console.log(totalDiscount)
-  //   return totalDiscount;
+    console.log(this.state.rows, 'state.rows');
 
-  // }
+    await this.setState((state) =>{
+      return {rows: rows}
+    }); 
+    console.log(this.state.rows, 'state.rows');
 
-  async addOrderRow(){
-    console.log(this.state.newOrderRowData);
-    const rows = this.state.newOrderData.rows.slice();
-    rows.push(this.state.newOrderRowData);
+
 
     let totalSum = null;
     rows.forEach(row => totalSum += row.totalSum)
 
-    let totalDiscount= null;
+    let totalDiscount = null;
     rows.forEach(row => totalDiscount += row.totalDiscount)
 
 
@@ -105,14 +99,14 @@ class Order extends Component {
         customerId: this.context.customer.id,
         totalSum: totalSum,
         totalDiscount: totalDiscount,
-        rows : rows
+        rows : this.state.rows
       }
     })
-    console.log(this.state.newOrderData.rows)
 
-      console.log(this.state.newOrderRowData);
+    console.log(this.state.rows, 'state.rows');
 
-      console.log(this.state.newOrderData);
+    console.log(this.state.rows, 'state.rows');
+
 
   }
 
@@ -178,6 +172,7 @@ class Order extends Component {
 // }
 
 async onSelect(e) {
+  console.log(this.state.rows, 'state.rows');
 
   const [productId, productType, productPrice] = e.target.value.split(',');
 
@@ -189,9 +184,8 @@ async onSelect(e) {
       }
     });
 
-    {this.product = this.state.products.find(p => p.productId === this.state.productId)}
-
-    this.getDiscount();
+    //Set current discount rate based on customerType and Product currently selected
+    this.setDiscount();
 
     let {newOrderRowData} = this.state;
 
@@ -199,8 +193,13 @@ async onSelect(e) {
               newOrderRowData.singleProductPrice = this.state.product.productPrice;
               newOrderRowData.totalSum = this.state.product.productPrice * this.state.newOrderRowData.quantity;
               newOrderRowData.totalDiscount = (this.state.product.productPrice * this.state.newOrderRowData.quantity) * this.state.discount;
+    console.log(this.state.newOrderData.rows, 'state.rows');
+
 
               this.setState({newOrderRowData});
+    console.log(this.state.newOrderData.rows, 'state.rows');
+
+      console.log(this.state.newOrderData);
       console.log(newOrderRowData);
 }
 
@@ -222,7 +221,7 @@ setCustomerState(){
   )
 }
 
-getDiscount = () => {
+setDiscount = () => {
 
     if(this.context.customer.customerType === "Large Company" && (this.state.product.productType === 'Pen' ||this.state.product.productType === 'Paper' )){
       this.setState({
@@ -285,7 +284,7 @@ getDiscount = () => {
         </FormGroup>
         <FormGroup>
           <Label for="quantity">Quantity</Label>
-          <Input type="number" min="1" placeholder="1" id="quantity" value={this.state.newOrderRowData.quantity} onChange={(e) => {
+          <Input type="number" min="1" placeholder="Select quantity" id="quantity" value={this.state.newOrderRowData.quantity} onChange={(e) => {
               let {newOrderRowData} = this.state;
 
               newOrderRowData.quantity = e.target.value;
@@ -295,8 +294,8 @@ getDiscount = () => {
         </FormGroup>     
         </ModalBody>
         <ModalFooter>
-        <Button color="primary" onClick={this.sendOrder.bind(this)}>Send Order</Button>{' '}
-          <Button color="primary" onClick={this.addOrderRow.bind(this)}>Add Order</Button>{' '}
+        <Button color="primary" onClick={this.sendOrder.bind(this)}>Send Order</Button>
+          <Button color="primary" onClick={this.addOrderRowToOrder.bind(this)}>Add Order</Button>
           <Button color="secondary" onClick={this.toggleNewOrderModal.bind(this)}>Cancel</Button>
         </ModalFooter>
       </Modal>
