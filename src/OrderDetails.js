@@ -24,6 +24,7 @@ class OrderDetails extends Component {
             products: response.data,
           })
         });
+        console.log(this.state.products)
         await Axios.get('https://localhost:44345/api/Orders/OrderRows/' + this.props.orderId).then((response) =>{
           console.log(response.data)      
           this.setState({
@@ -52,7 +53,7 @@ class OrderDetails extends Component {
         return (
           <tr key={orderRow.id}>
                 {/* <td>{orderRow.id}</td> */}
-                <td>{orderRow.product}</td>
+                <td>{this.state.products.find(p => p.id === orderRow.productId).productType}</td>
                 <td>{orderRow.quantity}</td>
                 <td>{orderRow.totalSum}</td>
                 <td>{orderRow.totalDiscount}</td>
@@ -65,7 +66,8 @@ class OrderDetails extends Component {
       })
 
       return <div>
-          <h1>Order Details for orderId: {this.props.orderId} </h1>
+          <p></p>
+          <h3>Order details for orderId: {this.props.orderId} </h3>
           <Table>
           <thead>
             <tr>

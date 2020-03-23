@@ -156,8 +156,8 @@ async detailsCustomer(id, customer) {
               <td>{customer.customerType}</td>
               <td>
                 <Button color="success" size="sm" className="mr-2" onClick={this.editCustomer.bind(this, customer.id, customer.name, customer.customerType)}>Edit</Button>
-                <Button color="danger" size="sm" className="mr-2" onClick={this.deleteCustomer.bind(this, customer.id)}>Delete</Button>
                 <Button color="success" size="sm" className="mr-2" onClick={this.detailsCustomer.bind(this, customer.id, customer)}>Orders</Button>
+                <Button color="danger" size="sm" className="mr-2" onClick={this.deleteCustomer.bind(this, customer.id)}>Delete</Button>
               </td>
               </tr>
       )

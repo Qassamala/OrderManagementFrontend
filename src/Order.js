@@ -301,7 +301,7 @@ setDiscount = () => {
           <FormGroup>
             <Label for="productType">Product</Label>
             <Input type="select" name="productType" placeholder="Select product" id="productType" onChange={this.onSelectProduct}>
-            
+
             {this.state.products.map((product) => (
               <option key ={product.id} value = {[product.id, product.productType, product.price]}>
                   {product.productType}
@@ -312,18 +312,11 @@ setDiscount = () => {
         <FormGroup>
           <Label for="quantity">Quantity</Label>
           <Input type="number" min="1" placeholder="Select quantity" id="quantity" onChange={this.onSelectQuantity}></Input>
-             {/* {
-              let {newOrderRowData} = this.state;
-
-              newOrderRowData.quantity = e.target.value;
-
-              this.setState({newOrderRowData});
-            }}/> */}
         </FormGroup>     
         </ModalBody>
         <ModalFooter>
         <Button color="primary" onClick={this.sendOrder.bind(this)}>Send Order</Button>
-          <Button color="primary" onClick={this.addOrderRowToOrder.bind(this)}>Add Order</Button>
+          <Button color="primary" onClick={this.addOrderRowToOrder.bind(this)}>Add to order</Button>
           <Button color="secondary" onClick={this.toggleNewOrderModal.bind(this)}>Cancel</Button>
         </ModalFooter>
       </Modal>

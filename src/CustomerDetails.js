@@ -21,6 +21,7 @@ class CustomerDetails extends Component {
 
         return(
         <div>
+            <button onClick={this.onNavigate} className="btn btn-primary" >Back to all customers</button>
                         
             <MyContext.Consumer>
             { 
@@ -30,7 +31,6 @@ class CustomerDetails extends Component {
             }
             </MyContext.Consumer>
             <p></p>
-            <button onClick={this.onNavigate} color="green">Go back button</button>
         </div>            
         )  
     }    
