@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {FormGroup, Input, Label, Modal, ModalHeader, ModalFooter, ModalBody, Table, Button,} from 'reactstrap';
 import Axios from 'axios';
+import OrderDetails from './OrderDetails';
 import MyContext from './MyContext';
 
 
@@ -20,14 +21,14 @@ class Order extends Component {
       customerId: this.props.customerId,
       orders: [],
       newOrderData: {
-          orderId: null,
+          orderId: 2,
           customerId: '',
           totalSum: '',
           totalDiscount: '',
           rows: []
       },
       newOrderRowData:{
-        orderId: 1,
+        orderId: 2,
         productId: null,
         singleProductPrice: null,
         quantity: null,
@@ -43,10 +44,19 @@ class Order extends Component {
           rows: []
       },
       newOrderModal : false,
-      editOrderModal : false
+      editOrderModal : false,
+      showOrderDetails: false,
+      showCloseButton: false,
+      selectedOrderId: null,
   };
+
   this.onSelectProduct = this.onSelectProduct.bind(this);
   this.onSelectQuantity = this.onSelectQuantity.bind(this);
+  this.editOrder = this.editOrder.bind(this);
+  this.detailsOrder = this.detailsOrder.bind(this);
+  this.deleteOrder = this.deleteOrder.bind(this);
+
+
 
 }
 
@@ -58,6 +68,7 @@ class Order extends Component {
       })
     });
     await Axios.get('https://localhost:44345/api/Orders/customer/' + this.state.customerId).then((response) =>{
+      console.log(response.data)      
       this.setState({
         orders: response.data
       })
@@ -110,7 +121,7 @@ class Order extends Component {
 
   async sendOrder(){
     console.log(this.state.newOrderData, 'state.newOrderData');
-    const url = 'https://localhost:44345/api/Orders';
+    const url = 'https://localhost:44345/api/Orders/Customer/' + this.state.customerId;
     return  await Axios(url, {
       method: 'POST',
       headers: {
@@ -140,6 +151,16 @@ class Order extends Component {
     });
   }
 
+  detailsOrder(id){
+    console.log('test')
+    this.setState({
+      selectedOrderId: id,
+      showOrderDetails: !this.state.showOrderDetails,
+      showCloseButton: !this.state.showCloseButton
+    });
+    
+ }
+
   updateOrder(){
       Axios.put('https://localhost:44345/api/Orders/' + this.state.editOrderData.id, this.state.editOrderData)
       .then((response) => {
@@ -165,10 +186,6 @@ class Order extends Component {
       this._refreshOrdersList();
   }); 
 }
-
-// detailsOrder(id){
-//     // BrowserRouter.push("/CustomerDetails" + id);
-// }
 
 setNewOrderRowData(){
 
@@ -255,11 +272,10 @@ setDiscount = () => {
       return (
         <tr key={order.id}>
               <td>{order.id}</td>
-              <td>{order.customerId}</td>
               <td>{order.totalSum}</td>
               <td>{order.totalDiscount}</td>
               <td>
-                <Button color="success" size="sm" className="mr-2" onClick={this.editOrder.bind(this, order.id, order.customerId, order.totalSum, order.totalDiscount)}>Edit</Button>
+                {/* <Button color="success" size="sm" className="mr-2" onClick={this.editOrder.bind(this, order.id, order.customerId, order.totalSum, order.totalDiscount)}>Edit</Button> */}
                 <Button color="success" size="sm" className="mr-2" onClick={this.detailsOrder.bind(this, order.id)}>Details</Button>
                 <Button color="danger" size="sm" onClick={this.deleteOrder.bind(this, order.id)}>Delete</Button>
               </td>
@@ -350,10 +366,9 @@ setDiscount = () => {
         <Table>
           <thead>
             <tr>
-              <th>Id</th>
-              <th>Product</th>
-              <th>Quantity</th>
+              <th>Order Id</th>
               <th>Total Sum</th>
+              <th>Total Discount</th>            
               <th>Actions</th>
             </tr>
           </thead>
@@ -363,6 +378,10 @@ setDiscount = () => {
 
           </tbody>
         </Table>
+        <p></p>
+
+        {this.state.showOrderDetails ? <OrderDetails orderId={this.state.selectedOrderId}/> : null}
+        {this.state.showCloseButton ? <button onClick={this.detailsOrder}>Close</button>: null}
 
       </div>
     );
