@@ -4,9 +4,8 @@ import Axios from 'axios';
 import MyContext from './MyContext';
 
 
-
-
 class Customer extends Component {
+  static contextType = MyContext;
   constructor(props){
     super(props);
       this.state = {
@@ -27,7 +26,6 @@ class Customer extends Component {
       };
 
   }
-  static contextType = MyContext;
 
 
  async componentDidMount(){
@@ -158,8 +156,8 @@ async detailsCustomer(id, customer) {
               <td>{customer.customerType}</td>
               <td>
                 <Button color="success" size="sm" className="mr-2" onClick={this.editCustomer.bind(this, customer.id, customer.name, customer.customerType)}>Edit</Button>
-                <Button color="success" size="sm" className="mr-2" onClick={this.detailsCustomer.bind(this, customer.id, customer)}>Details</Button>
-                <Button color="danger" size="sm" onClick={this.deleteCustomer.bind(this, customer.id)}>Delete</Button>
+                <Button color="danger" size="sm" className="mr-2" onClick={this.deleteCustomer.bind(this, customer.id)}>Delete</Button>
+                <Button color="success" size="sm" className="mr-2" onClick={this.detailsCustomer.bind(this, customer.id, customer)}>Orders</Button>
               </td>
               </tr>
       )
@@ -255,14 +253,6 @@ async detailsCustomer(id, customer) {
         </Table>
 
         <div>
-    <MyContext.Consumer>
-      {      
-      props => {
-        return <h3>Test Context Id: {this.context.customerId}</h3>
-        
-      }
-      }
-    </MyContext.Consumer>
     </div>
         
       </div>

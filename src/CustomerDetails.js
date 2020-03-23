@@ -21,15 +21,16 @@ class CustomerDetails extends Component {
 
         return(
         <div>
-            <button onClick={this.onNavigate} className="btn btn-primary">Go back button</button>
                         
             <MyContext.Consumer>
             { 
              props => {
-            return <Order customerId={this.context.customerId}></Order> 
-            }
+                 return <Order customerId={this.context.customerId}></Order> 
+                }
             }
             </MyContext.Consumer>
+            <p></p>
+            <button onClick={this.onNavigate} color="green">Go back button</button>
         </div>            
         )  
     }    
