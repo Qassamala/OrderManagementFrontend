@@ -19,11 +19,8 @@ class OrderDetails extends Component {
         },
       }
       this.editOrder = this.editOrder.bind(this);
-      this.deleteOrder = this.deleteOrder.bind(this);
+      this.deleteOrderRow = this.deleteOrderRow.bind(this);
       this._refreshOrdersList = this._refreshOrdersList.bind(this);
-
-
-    //   this.detailsOrder = this.detailsOrder.bind(this);
 
     }
     async componentDidMount(){
@@ -75,7 +72,25 @@ class OrderDetails extends Component {
           }); 
         }
 
-     async deleteOrder(rowId){
+     async deleteOrderRow(rowId){
+
+        if(this.state.orderRows.length < 2){
+
+            Axios.delete('https://localhost:44345/api/Orders/' + this.props.orderId)
+                .then((response) => {
+                this._refreshOrdersList();
+                });
+
+                this.setState({
+                    newOrderData: {
+                     id: null,
+                     customerId: '',
+                     totalSum: '',
+                     totalDiscount: '',
+                     rows: []
+                  }});
+
+        }else {            
          
         //Calculate new total sum and total discount
         const rows = Object.assign([], this.state.orderRows);
@@ -88,6 +103,8 @@ class OrderDetails extends Component {
           }).indexOf(rowId);
 
         rows.splice(index, 1);
+
+        console.log(index)
 
         console.log(this.state.orderRows);
 
@@ -137,6 +154,8 @@ class OrderDetails extends Component {
     //     .then((response) => {
     //       this._refreshOrdersList();
     //   }); 
+
+        }
     }
     
   
@@ -152,7 +171,7 @@ class OrderDetails extends Component {
                 <td>{orderRow.totalDiscount}</td>
                 <td>
                   <Button color="success" size="sm" className="mr-2" onClick={this.editOrder.bind(this, orderRow.id, orderRow.totalSum, orderRow.totalDiscount)}>Edit</Button>
-                  <Button color="danger" size="sm" onClick={this.deleteOrder.bind(this, orderRow.id)}>Delete</Button>
+                  <Button color="danger" size="sm" onClick={this.deleteOrderRow.bind(this, orderRow.id)}>Delete</Button>
                 </td>
                 </tr>
         )
