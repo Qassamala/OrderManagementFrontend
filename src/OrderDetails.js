@@ -20,7 +20,7 @@ class OrderDetails extends Component {
       }
       this.editOrder = this.editOrder.bind(this);
       this.deleteOrderRow = this.deleteOrderRow.bind(this);
-      this._refreshOrdersList = this._refreshOrdersList.bind(this);
+      this._refreshOrderRowsList = this._refreshOrderRowsList.bind(this);
 
     }
     async componentDidMount(){
@@ -48,7 +48,7 @@ class OrderDetails extends Component {
         console.log(this.state.newOrderData)
         Axios.put('https://localhost:44345/api/Orders/OrderRow/' + this.state.newOrderData.orderId, this.state.newOrderData)
         .then((response) => {
-          this._refreshOrdersList();          
+          this._refreshOrderRowsList();          
       });
       this.setState({
         newOrderData: {
@@ -61,7 +61,7 @@ class OrderDetails extends Component {
        
     }
     
-    async _refreshOrdersList(){
+    async _refreshOrderRowsList(){
         console.log(this.state.orderRows)
       
         await Axios.get('https://localhost:44345/api/Orders/OrderRows/' + this.props.orderId).then((response) =>{
@@ -73,12 +73,13 @@ class OrderDetails extends Component {
         }
 
      async deleteOrderRow(rowId){
-
+         
+        // If only one orderrow left, delete entire order
         if(this.state.orderRows.length < 2){
 
             Axios.delete('https://localhost:44345/api/Orders/' + this.props.orderId)
                 .then((response) => {
-                this._refreshOrdersList();
+                this._refreshOrderRowsList();
                 });
 
                 this.setState({
@@ -95,36 +96,15 @@ class OrderDetails extends Component {
         //Calculate new total sum and total discount
         const rows = await Object.assign([], this.state.orderRows);
 
-        console.log(rows);
-
         var index = rows.findIndex(x => x.id === rowId);
 
-        console.log(index)
-
-        // var index = await rows.indexOf(rowId);
-
-
-        // var index = rows.map(x => {
-        //     return x.Id;
-        //   }).indexOf(rowId);
-
-        console.log(rowId)
-
         rows.splice(index, 1);
-
-
-        console.log(this.state.orderRows);
-
-        console.log(rows);
-
 
         let totalSum = null;
         rows.forEach(row => totalSum += row.totalSum)
 
         let totalDiscount = null;
         rows.forEach(row => totalDiscount += row.totalDiscount)
-
-        console.log(this.props.orderId)
 
         await this.setState(prevState => ({
             newOrderData: {
@@ -137,13 +117,10 @@ class OrderDetails extends Component {
             }
           }));
 
-        console.log(rowId)
-        console.log(this.state.newOrderData)
-
         Axios.put('https://localhost:44345/api/Orders/' + this.state.newOrderData.id, this.state.newOrderData)
         .then((response) => {
             console.log(response);
-          this._refreshOrdersList();
+          this._refreshOrderRowsList();
       });
 
       this.setState({
