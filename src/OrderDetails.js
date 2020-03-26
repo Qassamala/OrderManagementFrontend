@@ -8,7 +8,13 @@ class OrderDetails extends Component {
     constructor(props){
       super(props);
       this.state = {
+          discount: 0.1,
           products: [],
+          product: {
+            productId: '',
+            productType: '',
+            productPrice: ''
+          },
           orderRows: [],
           newOrderData: {
             id: null,
@@ -17,6 +23,24 @@ class OrderDetails extends Component {
             totalDiscount: '',
             rows: []
         },
+        editOrderData: {
+            id: null,
+            customerId: '',
+            totalSum: '',
+            totalDiscount: '',
+            rows: []
+        },
+        editOrderRowData:{
+            id: null,
+            orderId: null,
+            productId: null,
+            singleProductPrice: null,
+            quantity: null,
+            totalSum: null,
+            totalDiscount: null,
+      
+          },
+        editOrderModal : false,
       }
       this.editOrder = this.editOrder.bind(this);
       this.deleteOrderRow = this.deleteOrderRow.bind(this);
@@ -38,21 +62,39 @@ class OrderDetails extends Component {
         }); 
       }
 
-      editOrder(id, totalSum, totalDiscount, rows){
+      toggleEditOrderModal(){
         this.setState({
-           editOrderData: { id, totalSum, totalDiscount, rows}, editOrderModal: !this.state.editOrderModal
+          editOrderModal : !this.state.editOrderModal
+        })
+      }
+
+      editOrder(id, totalSum, totalDiscount){
+          console.log(id, 'rowid')
+        this.setState({
+            editOrderRowData: {
+                orderId: id,
+                totalSum: totalSum,
+                totalDiscount: totalDiscount
+            },
+            editOrderModal: !this.state.editOrderModal
        });
+       console.log(editOrderRowData, 'editOrderRowData')       
      }
 
      updateOrder(){
-        console.log(this.state.newOrderData)
-        Axios.put('https://localhost:44345/api/Orders/OrderRow/' + this.state.newOrderData.orderId, this.state.newOrderData)
+         console.log(this.state.orderRows, 'this.state.orderRows')
+        console.log(this.state.newOrderData, 'neworderdata')
+        console.log(this.state.editOrderData, 'editorderdata')
+
+
+        Axios.put('https://localhost:44345/api/Orders/Update/' + this.state.editOrderData.id, this.state.editOrderData)
         .then((response) => {
           this._refreshOrderRowsList();          
       });
       this.setState({
-        newOrderData: {
-         orderId: null,
+        editOrderModal: false,
+        editOrderData: {
+         id: null,
          customerId: '',
          totalSum: '',
          totalDiscount: '',
@@ -117,7 +159,7 @@ class OrderDetails extends Component {
             }
           }));
 
-        Axios.put('https://localhost:44345/api/Orders/' + this.state.newOrderData.id, this.state.newOrderData)
+        Axios.put('https://localhost:44345/api/Orders/DeleteOrderRow/' + this.state.newOrderData.id, this.state.newOrderData)
         .then((response) => {
             console.log(response);
           this._refreshOrderRowsList();
@@ -141,6 +183,66 @@ class OrderDetails extends Component {
 
         }
     }
+
+    async onSelectProduct(e) {
+        console.log(this.state.rows, 'state.rows');
+      
+        const [productId, productType, productPrice] = e.target.value.split(',');
+      
+          await this.setState({
+            product:{
+              productId,
+              productType,
+              productPrice,
+            }
+          });
+      
+          //Set current discount rate based on customerType and Product currently selected    
+          await this.setDiscount();
+          
+          await this.setEditOrderRowData();
+      }
+
+      setDiscount = () => {
+
+        if(this.context.customer.customerType === "Large Company" && (this.state.product.productType === 'Pen' ||this.state.product.productType === 'Paper' )){
+          this.setState({
+            discount: 0.3
+          })
+          console.log(this.state.discount)
+        }
+        else if(this.context.customer.customerType === "Large Company" && (this.state.product.productType === 'Notebook' ||this.state.product.productType === 'Eraser' ) ){
+          this.setState({
+            discount: 0.1
+          })
+          console.log(this.state.discount)
+        }
+        else if(this.context.customer.customerType === "Private Customer"){
+          this.setState({
+            discount: 0.0
+          })
+          console.log(this.state.discount)
+        }
+    }
+
+    async onSelectQuantity(e) {
+        let quantity = e.target.value;
+      
+        this.setState(prevState =>({
+            editOrderRowData: { ...prevState.editOrderRowData, quantity: quantity }
+        }));
+      }
+
+    setEditOrderRowData(){
+
+        this.setState(prevState => ({
+         editOrderRowData: { ...prevState.editOrderRowData,
+               productId : this.state.product.productId,
+               singleProductPrice : this.state.product.productPrice,
+               totalSum : this.state.product.productPrice * this.state.editOrderRowData.quantity,
+               totalDiscount : (this.state.product.productPrice * this.state.editOrderRowData.quantity) * this.state.discount
+       }}));
+ }
     
   
   render(){
@@ -160,8 +262,36 @@ class OrderDetails extends Component {
                 </tr>
         )
       })
+      
+      
 
       return <div>
+
+            <Modal isOpen={this.state.editOrderModal} toggle={this.toggleEditOrderModal.bind(this)}>
+        <ModalHeader toggle={this.toggleEditOrderModal.bind(this)}>Edit order</ModalHeader>
+        <ModalBody>
+        <FormGroup>
+            <Label for="productType">Product</Label>
+            <Input type="select" name="productType" placeholder="Select product" id="productType" onChange={this.onSelectProduct}>
+
+            {this.state.products.map((product) => (
+              <option key ={product.id} value = {[product.id, product.productType, product.price]}>
+                  {product.productType}
+                </option>
+             ))},                      
+            </Input>            
+        </FormGroup>
+        <FormGroup>
+          <Label for="quantity">Quantity</Label>
+          <Input type="number" min="1" placeholder="Select quantity" id="quantity" onChange={this.onSelectQuantity}></Input>
+        </FormGroup> 
+          
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={this.updateOrder.bind(this)}>Update</Button>{' '}
+          <Button color="secondary" onClick={this.toggleEditOrderModal.bind(this)}>Cancel</Button>
+        </ModalFooter>
+      </Modal>
           <p></p>
           <h3>Order details for orderId: {this.props.orderId} </h3>
           <Table>
