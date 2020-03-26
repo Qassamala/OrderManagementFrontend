@@ -78,7 +78,7 @@ class OrderDetails extends Component {
             },
             editOrderModal: !this.state.editOrderModal
        });
-       console.log(editOrderRowData, 'editOrderRowData')       
+       console.log(this.state.editOrderRowData, 'editOrderRowData')       
      }
 
      updateOrder(){
