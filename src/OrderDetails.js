@@ -93,18 +93,25 @@ class OrderDetails extends Component {
         }else {            
          
         //Calculate new total sum and total discount
-        const rows = Object.assign([], this.state.orderRows);
+        const rows = await Object.assign([], this.state.orderRows);
 
         console.log(rows);
 
+        var index = rows.findIndex(x => x.id === rowId);
 
-        var index = rows.map(x => {
-            return x.Id;
-          }).indexOf(rowId);
+        console.log(index)
+
+        // var index = await rows.indexOf(rowId);
+
+
+        // var index = rows.map(x => {
+        //     return x.Id;
+        //   }).indexOf(rowId);
+
+        console.log(rowId)
 
         rows.splice(index, 1);
 
-        console.log(index)
 
         console.log(this.state.orderRows);
 
