@@ -59,7 +59,8 @@ class OrderDetails extends Component {
           this.setState({
             orderRows: response.data
           })
-        }); 
+        });
+        console.log(this.state.orderRows)
       }
 
       toggleEditOrderModal(){
@@ -68,26 +69,28 @@ class OrderDetails extends Component {
         })
       }
 
-      editOrder(id, totalSum, totalDiscount){
+      async editOrder(id, totalSum, totalDiscount){
           console.log(id, 'rowid')
-        this.setState({
+        await this.setState({
             editOrderRowData: {
-                orderId: id,
+                id: id,
+                orderId: this.props.orderId,
                 totalSum: totalSum,
                 totalDiscount: totalDiscount
             },
             editOrderModal: !this.state.editOrderModal
        });
-       console.log(this.state.editOrderRowData, 'editOrderRowData')       
+       console.log(this.state.editOrderRowData, 'editOrderRowData')
+       console.log(this.state.orderRows)
+
      }
 
-     updateOrder(){
-         console.log(this.state.orderRows, 'this.state.orderRows')
-        console.log(this.state.newOrderData, 'neworderdata')
+     async updateOrder(){
+        console.log(this.state.orderRows, 'this.state.orderRows')
         console.log(this.state.editOrderData, 'editorderdata')
 
 
-        Axios.put('https://localhost:44345/api/Orders/Update/' + this.state.editOrderData.id, this.state.editOrderData)
+        await Axios.put('https://localhost:44345/api/Orders/Update/' + this.state.editOrderData.id, this.state.editOrderData)
         .then((response) => {
           this._refreshOrderRowsList();          
       });
@@ -185,7 +188,8 @@ class OrderDetails extends Component {
     }
 
     async onSelectProduct(e) {
-        console.log(this.state.rows, 'state.rows');
+        console.log(this.state.orderRows)
+        
       
         const [productId, productType, productPrice] = e.target.value.split(',');
       
@@ -196,11 +200,20 @@ class OrderDetails extends Component {
               productPrice,
             }
           });
+          console.log(this.state.product)
       
           //Set current discount rate based on customerType and Product currently selected    
           await this.setDiscount();
           
           await this.setEditOrderRowData();
+
+        console.log(this.state.orderRows)
+        console.log(this.state.editOrderRowData)
+
+        await this.setEditOrderData();
+
+
+
       }
 
       setDiscount = () => {
@@ -227,8 +240,9 @@ class OrderDetails extends Component {
 
     async onSelectQuantity(e) {
         let quantity = e.target.value;
-      
-        this.setState(prevState =>({
+        
+        console.log(quantity, 'quantity')
+        await this.setState(prevState =>({
             editOrderRowData: { ...prevState.editOrderRowData, quantity: quantity }
         }));
       }
@@ -236,13 +250,52 @@ class OrderDetails extends Component {
     setEditOrderRowData(){
 
         this.setState(prevState => ({
-         editOrderRowData: { ...prevState.editOrderRowData,
+            editOrderRowData: { ...prevState.editOrderRowData,
                productId : this.state.product.productId,
                singleProductPrice : this.state.product.productPrice,
                totalSum : this.state.product.productPrice * this.state.editOrderRowData.quantity,
                totalDiscount : (this.state.product.productPrice * this.state.editOrderRowData.quantity) * this.state.discount
        }}));
  }
+
+ async setEditOrderData(){
+
+        const rows = await Object.assign([], this.state.orderRows);
+
+        console.log(this.state.editOrderRowData.id)
+
+
+        var index =  await rows.findIndex(x => x.id === this.state.editOrderRowData.id);
+        
+        console.log(index)
+        console.log(rows[index])
+        console.log(this.state.editOrderRowData)
+
+        rows[index] = this.state.editOrderRowData;
+
+        console.log(rows[index])
+
+        console.log(rows)
+
+        let totalSum = null;
+        rows.forEach(row => totalSum += row.totalSum)
+
+        let totalDiscount = null;
+        rows.forEach(row => totalDiscount += row.totalDiscount)
+
+        await this.setState(prevState => ({
+            editOrderData: {
+              ...prevState.editOrderData,
+              id: this.props.orderId,
+              customerId: this.context.customer.id,
+              totalSum: totalSum,
+              totalDiscount: totalDiscount,
+              rows : rows
+            }
+          }));
+
+          console.log(this.state.editOrderData)
+}
     
   
   render(){
@@ -272,7 +325,7 @@ class OrderDetails extends Component {
         <ModalBody>
         <FormGroup>
             <Label for="productType">Product</Label>
-            <Input type="select" name="productType" placeholder="Select product" id="productType" onChange={this.onSelectProduct}>
+            <Input type="select" name="productType" placeholder="Select product" id="productType" onChange={this.onSelectProduct.bind(this)}>
 
             {this.state.products.map((product) => (
               <option key ={product.id} value = {[product.id, product.productType, product.price]}>
@@ -283,7 +336,7 @@ class OrderDetails extends Component {
         </FormGroup>
         <FormGroup>
           <Label for="quantity">Quantity</Label>
-          <Input type="number" min="1" placeholder="Select quantity" id="quantity" onChange={this.onSelectQuantity}></Input>
+          <Input type="number" min="1" placeholder="Select quantity" id="quantity" onChange={this.onSelectQuantity.bind(this)}></Input>
         </FormGroup> 
           
         </ModalBody>
