@@ -177,19 +177,11 @@ class OrderDetails extends Component {
          rows: []
       }});
 
-        //   this.updateOrder();
-
-    //     Axios.delete('https://localhost:44345/api/Orders/' + id)
-    //     .then((response) => {
-    //       this._refreshOrdersList();
-    //   }); 
-
         }
     }
 
     async onSelectProduct(e) {
-        console.log(this.state.orderRows)
-        
+        console.log(this.state.orderRows)        
       
         const [productId, productType, productPrice] = e.target.value.split(',');
       
@@ -211,8 +203,6 @@ class OrderDetails extends Component {
         console.log(this.state.editOrderRowData)
 
         await this.setEditOrderData();
-
-
 
       }
 
@@ -314,9 +304,7 @@ class OrderDetails extends Component {
                 </td>
                 </tr>
         )
-      })
-      
-      
+      })            
 
       return <div>
 
@@ -365,13 +353,8 @@ class OrderDetails extends Component {
           </tbody>
         </Table>
           
-
-
       </div>
-  }
-
-
-  
+  }  
   
   }
 

@@ -28,7 +28,7 @@ class Order extends Component {
           rows: []
       },
       newOrderRowData:{
-        orderId: 2,
+        orderId: 1, //required by input but will be set by localdb
         productId: null,
         singleProductPrice: null,
         quantity: null,
@@ -55,8 +55,6 @@ class Order extends Component {
   this.editOrder = this.editOrder.bind(this);
   this.detailsOrder = this.detailsOrder.bind(this);
   this.deleteOrder = this.deleteOrder.bind(this);
-
-
 
 }
 
@@ -219,10 +217,10 @@ async onSelectProduct(e) {
       }
     });
 
-    await this.setNewOrderRowData();
-    
     //Set current discount rate based on customerType and Product currently selected    
     await this.setDiscount();
+    
+    await this.setNewOrderRowData();
 }
 
 getProductPrice = () => {

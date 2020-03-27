@@ -24,16 +24,12 @@ class Customer extends Component {
         editCustomerModal : false
     
       };
-
   }
-
 
  async componentDidMount(){
     await Axios.get('https://localhost:44345/api/Customers').then((response) =>{
        this.setState({
-        customers: response.data
-        
-
+        customers: response.data      
       })
     });
   }
